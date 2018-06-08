@@ -26,6 +26,11 @@ export default new Router({
           component: resolve => require(['views/MeetingCreate/MeetingCreate'], resolve)
         }
       ]
+    },
+    {
+      path: '/demo',
+      name: 'demo',
+      component: resolve => require(['components/demo'], resolve)
     }
   ]
 })

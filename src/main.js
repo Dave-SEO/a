@@ -6,8 +6,11 @@ import router from './router'
 import ElementUI from 'element-ui'
 import 'assets/css/reset.css'
 import 'element-ui/lib/theme-chalk/index.css'
-Vue.config.productionTip = false
+import '@/assets/css/zTreeStyle/zTreeStyle.css'
+import '@/assets/js/jquery-1.4.4.min.js'
+import '@/assets/js/jquery.ztree.core.min.js'
 
+Vue.config.productionTip = false
 Vue.use(ElementUI)
 /* eslint-disable no-new */
 new Vue({

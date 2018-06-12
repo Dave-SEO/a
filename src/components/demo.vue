@@ -19,9 +19,6 @@
 </template>
 
 <script>
-// import { tree } from "@/server/tree.js"
-let id = 1000
-
 export default {
   data () {
     // const data = [
@@ -53,28 +50,38 @@ export default {
           'Accept': 'application/js'
         })
 
-      }).then(function (res) {
-        res.json().then(function (data) {
+      }).then((res) => {
+        res.json().then((data) => {
           //   var zTreeObj = null
           // zTree 的参数配置，深入使用请参考 API 文档（setting 配置详解）
-          var setting = {}
+          var setting = {
+            data: {
+              parent: true
+            },
+            check: {
+              enable: true
+            },
+            view: {
+              showLine: true, // 显示节点之间的连线。
+              selectedMulti: false // 允许同时选中多个节点。
+            },
+            callback: {
+              onCheck: this.onCheck,
+              onClick: this.onClick,
+              beforeCheck: this.zTreeBeforeCheck
+            }
+          }
           // zTree 的数据属性，深入使用请参考 API 文档（zTreeNode 节点数据详解）
           // zTreeObj =
+          /* eslint-disable */
           $.fn.zTree.init($('#treeDemo'), setting, that.getTrees(JSON.parse(data), 0))
-          console.log($('#treeDemo'))
+          // console.log($('#treeDemo'))
           that.data1 = that.getTrees(JSON.parse(data), 0)
         })
       })
     })
   },
   methods: {
-    append (data) {
-      const newChild = { id: id++, label: 'testtest', children: [] }
-      if (!data.children) {
-        this.$set(data, 'children', [])
-      }
-      data.children.push(newChild)
-    },
     getTrees (list, parentId) {
       /**
          * 树状的算法
@@ -113,26 +120,32 @@ export default {
       // console.log(result)
       return result
     },
-    remove (node, data) {
-      console.log('node', node)
-      console.log('data', data)
-      const parent = node.parent
-      console.log('parent', parent)
-      const children = parent.data.children || parent.data
-      console.log('parent.data.children', parent.data.children)
-      console.log('parent.data', parent.data)
-      const index = children.findIndex(d => d.id === data.id)
-      //   function (d){
-      //       return  d.id === data.id
-      //   }
-      console.log('index', index)
-      // children.splice(index, 1);
+    onCheck(){
+       var treeObj = $.fn.zTree.getZTreeObj("treeDemo");  //获取树对象
+       var nodes = treeObj.getChangeCheckedNodes();       //获取勾选状态改变的节点
+      //  console.log(nodes)
+       let designIds = []
+       $.each(nodes, function (i, item) {
+                designIds.push(item.id);                       //将状态改变的节点id输出到数组
+                   item.checkedOld = item.checked;                //这句话很关键，将节点的初始状态置为当前状态。否则每次勾选操作获取状态改变节点时只会跟树初始化的状态相比较。
+        })
+        // console.log(designIds)
+    },
+    onClick(e, treeId, treeNode){
+      console.log('treeNode.name',treeNode.name);   //获取当前结点上的相关属性数据，执行相关逻辑
+    },
+    zTreeBeforeCheck(treeId, treeNode){
+      var treeObj = $.fn.zTree.getZTreeObj("treeDemo");
+      treeObj.checkAllNodes(false);
+      console.log(treeId)
+      console.log(treeNode)
     }
   }
 }
 </script>
 
 <style>
+
   .custom-tree-node {
     flex: 1;
     display: flex;

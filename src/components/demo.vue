@@ -15,6 +15,7 @@
     </el-tree> -->
     <!-- <Tree :data="data1"></Tree> -->
       <ul id="treeDemo" class="ztree"></ul>
+      <a id="addParent" href="#" title="增加父节点" onclick="return false;" @click="add(true)">增加父节点</a>
   </div>
 </template>
 
@@ -38,7 +39,8 @@ export default {
     //   }
     // ]
     return {
-      data1: []
+      data1: [],
+      newCount: 1
     //   data: JSON.parse(JSON.stringify(this.data1))
     }
   },
@@ -67,6 +69,7 @@ export default {
             },
             callback: {
               onCheck: this.onCheck,
+              beforeClick: this.beforeClick,
               onClick: this.onClick,
               beforeCheck: this.zTreeBeforeCheck
             }
@@ -131,6 +134,11 @@ export default {
         })
         // console.log(designIds)
     },
+    beforeClick (treeId, treeNode) {
+      var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+			zTree.checkNode(treeNode, !treeNode.checked, null, true);
+			return false;
+    },
     onClick(e, treeId, treeNode){
       console.log('treeNode.name',treeNode.name);   //获取当前结点上的相关属性数据，执行相关逻辑
     },
@@ -139,7 +147,24 @@ export default {
       treeObj.checkAllNodes(false);
       console.log(treeId)
       console.log(treeNode)
-    }
+    },
+     add(Parent) {
+			var zTree = $.fn.zTree.getZTreeObj("treeDemo"),
+			isParent = Parent,
+			nodes = zTree.getSelectedNodes(),
+			treeNode = nodes[0];
+			// alert(isParent)
+			if (treeNode) {
+				treeNode = zTree.addNodes(treeNode, {id:(100 + this.newCount), pId:treeNode.id, isParent:isParent, name:"new node" + (this.newCount++)});
+			} else {
+				treeNode = zTree.addNodes(null, {id:(100 + this.newCount), pId:0, isParent:isParent, name:"new node" + (this.newCount++)});
+			}
+			if (treeNode) {
+				zTree.editName(treeNode[0]);
+			} else {
+				alert("叶子节点被锁定，无法增加子节点");
+			}
+		}
   }
 }
 </script>
@@ -154,4 +179,12 @@ export default {
     font-size: 14px;
     padding-right: 8px;
   }
+  #addParent{
+    color: #25a4bb;
+    text-decoration: none;
+    position: absolute;
+    top: 30px;
+    left: 100px;
+  }
+     
 </style>

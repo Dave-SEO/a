@@ -11,6 +11,7 @@ import '@/assets/css/zTreeStyle.css'
 import '@/assets/js/jquery-1.4.4.min.js'
 import '@/assets/js/jquery.ztree.core.min.js'
 import '@/assets/js/jquery.ztree.excheck.min.js'
+import '@/assets/js/jquery.ztree.exedit.min.js'
 
 Vue.config.productionTip = false
 Vue.use(ElementUI)

@@ -15,6 +15,7 @@
     </el-tree> -->
     <!-- <Tree :data="data1"></Tree> -->
       <ul id="treeDemo" class="ztree"></ul>
+      <ul id="treeDemo1" class="ztree"></ul>
       <a id="addParent" href="#" title="增加父节点" onclick="return false;" @click="add(true)">增加父节点</a>
   </div>
 </template>
@@ -39,52 +40,111 @@ export default {
     //   }
     // ]
     return {
+      // data13:[{'id':1000000001,"pid":0,"name":"组A"},{"id":1000000002,"pid":1,"name":"组AA"},{"id":1000000003,"pid":1,"name":"组AA1"},{"id":1,"name":"admin","pid":1000000002},{"id":1,"name":"admin","pid":1000000003}],
       data1: [],
-      newCount: 1
+      newCount: 1,
+      setting: {
+        async: {
+          enable: true,
+          dataType: 'json',
+          type: 'get',
+          url: '/api/seller'
+        },
+        data: {
+          parent: true,
+          simpleData: {
+            enable: true
+          }
+        },
+        check: {
+          enable: true
+        },
+        view: {
+          showLine: true, // 显示节点之间的连线。
+          selectedMulti: false // 允许同时选中多个节点。
+        },
+        callback: {
+          onCheck: this.onCheck,
+          beforeClick: this.beforeClick,
+          onClick: this.onClick,
+          beforeCheck: this.zTreeBeforeCheck,
+          onAsyncSuccess: this.zTreeOnAsyncSuccess
+        }
+      }
     //   data: JSON.parse(JSON.stringify(this.data1))
     }
   },
   mounted () {
-    this.$nextTick(() => {
-      let that = this
-      fetch('http://127.0.0.1:8888', {
-        headers: new Headers({
-          'Accept': 'application/js'
-        })
+    /* eslint-disable */
+    $.fn.zTree.init($('#treeDemo'), this.setting)
+    // this.$nextTick(() => {
+    //   let that = this
+    //   fetch('http://127.0.0.1:8888/api/seller', {
+    //     headers: new Headers({
+    //       'Accept': 'application/js'
+    //     })
+    //   }).then((res) => {
+    //     res.json().then((data) => {
+    //       /* eslint-disable */
+    //       var a= [
+    //         {"id":1000000001,"pid":0,"name":"组A",isParent:true},
+    //         {"id":1,"name":"admin","pid":1000000001},
+    //         {"id":1000000002,"pid":1,"name":"组AA"},
+    //         {"id":1000000003,"pid":1,"name":"组AA1"},
+    //         {"id":2,"name":"tbadmin","pid":1000000001}
+    //       ]
+    //       $.fn.zTree.init($('#treeDemo'), this.setting, JSON.parse(data))
+    //       // $.fn.zTree.init($('#treeDemo1'), setting, that.getTrees(JSON.parse(data), 0))
+    //       // console.log($('#treeDemo'))
+    //       // that.data1 = that.getTrees(JSON.parse(data), 0)
+    //     })
 
-      }).then((res) => {
-        res.json().then((data) => {
-          //   var zTreeObj = null
-          // zTree 的参数配置，深入使用请参考 API 文档（setting 配置详解）
-          var setting = {
-            data: {
-              parent: true
-            },
-            check: {
-              enable: true
-            },
-            view: {
-              showLine: true, // 显示节点之间的连线。
-              selectedMulti: false // 允许同时选中多个节点。
-            },
-            callback: {
-              onCheck: this.onCheck,
-              beforeClick: this.beforeClick,
-              onClick: this.onClick,
-              beforeCheck: this.zTreeBeforeCheck
-            }
-          }
-          // zTree 的数据属性，深入使用请参考 API 文档（zTreeNode 节点数据详解）
-          // zTreeObj =
-          /* eslint-disable */
-          $.fn.zTree.init($('#treeDemo'), setting, that.getTrees(JSON.parse(data), 0))
-          // console.log($('#treeDemo'))
-          that.data1 = that.getTrees(JSON.parse(data), 0)
-        })
-      })
-    })
+
+    //    fetch('http://127.0.0.1:8888/api/sellerId', {
+    //     headers: new Headers({
+    //       'Accept': 'application/json'
+    //     })
+    //   }).then((res)=>{
+    //     res.json().then((data)=>{
+    //         console.log(data)
+    //         var sellerId = data.id
+    //         var treeObj = $.fn.zTree.getZTreeObj("treeDemo")
+    //         console.log(treeObj)
+    //         sellerId.forEach(element => {
+    //           console.log(element)
+    //         treeObj.checkNode(treeObj.getNodeByParam("id", '1', null), true, true)
+    //         });
+    //     })
+    //   })
+
+
+
+
+    //   })
+    // })
   },
   methods: {
+    zTreeOnAsyncSuccess(event, treeId, treeNode, msg){
+      // console.log('event',event)
+      // console.log('treeId',treeId)
+      // console.log('treeNode',treeNode)
+      // console.log('msg',msg)
+         fetch('http://127.0.0.1:8888/api/sellerId', {
+        headers: new Headers({
+          'Accept': 'application/json'
+        })
+      }).then((res)=>{
+        res.json().then((data)=>{
+            // console.log(data)
+            var sellerId = data.id
+            var treeObj = $.fn.zTree.getZTreeObj("treeDemo")
+            // console.log(treeObj)
+            sellerId.forEach(element => {
+              treeObj.checkNode(treeObj.getNodeByParam("id", element, null), true, true)
+            });
+        })
+      })
+    },
     getTrees (list, parentId) {
       /**
          * 树状的算法
@@ -123,10 +183,28 @@ export default {
       // console.log(result)
       return result
     },
-    onCheck(){
+    onCheck(event, treeId, treeNode){
        var treeObj = $.fn.zTree.getZTreeObj("treeDemo");  //获取树对象
        var nodes = treeObj.getChangeCheckedNodes();       //获取勾选状态改变的节点
-      //  console.log(nodes)
+       // 获取选中节点
+      //  selectNodes=treeObj.getCheckedNodes(true),
+      //  console.log('msg',treeObj.transformToArray(treeNode))
+       console.log('msg',treeObj.getCheckedNodes(true))
+      // 获取子id等数据
+      let attrId = []
+        attrId.push({'id':treeNode.id,'pId':treeNode.pId,'name':treeNode.name,'userId':''})
+        var userId=[]
+      for(let i =0; i<treeNode.children.length;i++){
+
+        userId.push(treeNode.children[i].id)
+        // attrId[0]['userId'].push(treeNode.children[i].id)
+      }
+      attrId[0]['userId'] =','+ userId.toString() + ','
+      console.log('userId',attrId)
+
+
+
+      treeObj.selectNode(treeNode);
        let designIds = []
        $.each(nodes, function (i, item) {
                 designIds.push(item.id);                       //将状态改变的节点id输出到数组
@@ -135,16 +213,21 @@ export default {
         // console.log(designIds)
     },
     beforeClick (treeId, treeNode) {
+      if(treeNode.name === '默认'){
+        return false
+      }
+      	var check = (treeNode && !treeNode.isParent);
+			console.log('beforeClick',treeNode)
       var zTree = $.fn.zTree.getZTreeObj("treeDemo");
 			zTree.checkNode(treeNode, !treeNode.checked, null, true);
-			return false;
+			// return false;
     },
     onClick(e, treeId, treeNode){
       console.log('treeNode.name',treeNode.name);   //获取当前结点上的相关属性数据，执行相关逻辑
     },
     zTreeBeforeCheck(treeId, treeNode){
       var treeObj = $.fn.zTree.getZTreeObj("treeDemo");
-      treeObj.checkAllNodes(false);
+      // treeObj.checkAllNodes(false);
       console.log(treeId)
       console.log(treeNode)
     },

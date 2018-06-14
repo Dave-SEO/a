@@ -199,21 +199,22 @@ export default {
       var people = []
       msg.forEach((item,index)=>{
         if(item.group === '1'){
-          group.push(item)
-          // group.push({id:item.id,pId:item.pId, name:item.name,group:item.group})
+          // group.push(item)
           item.userId = ','
+          group.push({id:item.id,pId:item.pId, name:item.name,group:item.group,userId:item.userId})
+          
         }else{
-          people.push(item)
-          // people.push({id:item.id,pId:item.pId, name:item.name,group:item.group})
+          // people.push(item)
+          people.push({id:item.id,pId:item.pId, name:item.name,group:item.group})
         }
       })
+      console.log(group)
       group.forEach((items,indexs)=>{
           people.forEach((list,i)=>{
             if(items.id ===  list.pId){
               console.log(items.id ===  list.pId)
               console.log('items.id',items.id)
               console.log('list.id',list.id)
-              debugger
               items.userId += list.id + ','
             }
           })

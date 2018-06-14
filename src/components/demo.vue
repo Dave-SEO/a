@@ -21,6 +21,7 @@
 </template>
 
 <script>
+var attrs = []
 export default {
   data () {
     // const data = [
@@ -39,6 +40,7 @@ export default {
     //       }]
     //   }
     // ]
+
     return {
       // data13:[{'id':1000000001,"pid":0,"name":"组A"},{"id":1000000002,"pid":1,"name":"组AA"},{"id":1000000003,"pid":1,"name":"组AA1"},{"id":1,"name":"admin","pid":1000000002},{"id":1,"name":"admin","pid":1000000003}],
       data1: [],
@@ -154,7 +156,7 @@ export default {
       let items = {}
       // 获取每个节点的直属子节点，*记住是直属，不是所有子节点
       for (let i = 0; i < list.length; i++) {
-        let key = list[i].parent_id
+        let key = list[i].pId
         if (items[key]) {
           items[key].push(list[i])
         } else {
@@ -163,8 +165,9 @@ export default {
         }
         // console.log(items)
       }
-      // console.log(items)
-      return this.formatTree(items, parentId)
+      console.log(items)
+      return items
+      // return this.formatTree(items, parentId)
     },
     formatTree (items, parentId) {
       /**
@@ -190,20 +193,43 @@ export default {
       //  selectNodes=treeObj.getCheckedNodes(true),
       //  console.log('msg',treeObj.transformToArray(treeNode))
        console.log('msg',treeObj.getCheckedNodes(true))
-      // 获取子id等数据
-      let attrId = []
-        attrId.push({'id':treeNode.id,'pId':treeNode.pId,'name':treeNode.name,'userId':''})
-        var userId=[]
-      for(let i =0; i<treeNode.children.length;i++){
+       var msg = treeObj.getCheckedNodes(true)
 
-        userId.push(treeNode.children[i].id)
-        // attrId[0]['userId'].push(treeNode.children[i].id)
-      }
-      attrId[0]['userId'] =','+ userId.toString() + ','
-      console.log('userId',attrId)
-
-
-
+      var group = []
+      var people = []
+      msg.forEach((item,index)=>{
+        if(item.group === '1'){
+          group.push(item)
+          // group.push({id:item.id,pId:item.pId, name:item.name,group:item.group})
+          item.userId = ','
+        }else{
+          people.push(item)
+          // people.push({id:item.id,pId:item.pId, name:item.name,group:item.group})
+        }
+      })
+      group.forEach((items,indexs)=>{
+          people.forEach((list,i)=>{
+            if(items.id ===  list.pId){
+              console.log(items.id ===  list.pId)
+              console.log('items.id',items.id)
+              console.log('list.id',list.id)
+              debugger
+              items.userId += list.id + ','
+            }
+          })
+      })
+      // people.forEach((items,indexs)=>{
+      //     group.forEach((list,i)=>{
+      //       if(items.id ===  list.pId){
+      //         console.log(items.id ===  list.pId)
+      //         console.log('items.id',items.id)
+      //         console.log('list.id',list.id)
+      //         items.userId += list.id + ','
+      //       }
+      //     })
+      // })
+      console.log('group',group)
+      console.log('people',people)
       treeObj.selectNode(treeNode);
        let designIds = []
        $.each(nodes, function (i, item) {
@@ -211,6 +237,12 @@ export default {
                    item.checkedOld = item.checked;                //这句话很关键，将节点的初始状态置为当前状态。否则每次勾选操作获取状态改变节点时只会跟树初始化的状态相比较。
         })
         // console.log(designIds)
+    },
+    attrpush(pushs){
+      pushs.forEach((item)=>{
+        attrs.push(item)
+      })
+      console.log('-------',attrs)
     },
     beforeClick (treeId, treeNode) {
       if(treeNode.name === '默认'){
@@ -253,7 +285,6 @@ export default {
 </script>
 
 <style>
-
   .custom-tree-node {
     flex: 1;
     display: flex;
